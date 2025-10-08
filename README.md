@@ -1,56 +1,62 @@
-# Forex Events Scheduler
+# Forex Factory Scraper
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue)
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue)
 
-This repository contains a Python script that fetches and processes Forex events from [ForexFactory's](https://www.forexfactory.com/) weekly calendar. The script is designed to run periodically, saving Forex events to structured files for easy analysis and tracking. It supports filtering events by currency, title, and impact, and allows users to save the output in either JSON or TXT format.
+A Python package to fetch, filter, and save Forex events from [Forex Factory's](https://www.forexfactory.com/) weekly calendar. The package supports filtering events by currency, title, and impact, and saves output in JSON or TXT format. It includes scheduling capabilities, timezone support, and trading session identification.
 
 ## Features
 
-- **Automated Fetching**: Fetches Forex events from ForexFactory's weekly calendar every hour.
-- **Event Parsing**: Extracts key details for each event, including title, currency, date, time, impact, forecast, previous value, and URL.
+- **Automated Fetching**: Fetches Forex events from Forex Factory's weekly calendar.
+- **Event Parsing**: Extracts details like title, currency, date, time, impact, forecast, previous value, and URL.
 - **Custom Filters**: Filter events by:
   - **Currency** (e.g., USD, EUR)
   - **Title** (case-insensitive search)
   - **Impact** (e.g., High, Medium, Low)
 - **Output Formats**: Save events in:
-  - **JSON**: Structured and machine-readable format.
-  - **TXT**: Human-readable, formatted text files.
+  - **JSON**: Structured and machine-readable.
+  - **TXT**: Human-readable, formatted text.
 - **Custom File Names**: Specify a custom base name for output files.
-- **Scheduling**: Automatically runs the script every hour using the `schedule` library.
-- **Timezone Support**: Convert event times to a specified timezone or use the system's local timezone.
-- **Trading Sessions**: Identifies active trading sessions (e.g., London, New York) and highlights "Golden Time" during overlaps.
-- **Configuration File**: Load options from a JSON config file for easier automation.
+- **Scheduling**: Run the script hourly using the `schedule` library.
+- **Timezone Support**: Convert event times to a specified or system timezone.
+- **Trading Sessions**: Identifies active sessions (e.g., London, New York) and "Golden Time" (London-NY overlap).
+- **Configuration File**: Load options from a JSON config file for automation.
 
 ## Installation
 
+### From Source
 1. Clone the repository:
     ```sh
-    git clone https://github.com/abbasi0abolfazl/forexfactory_calender.git
-    cd forexfactory_calender
+    git clone https://github.com/abbasi0abolfazl/forexfactory-scraper.git
+    cd forexfactory-scraper
     ```
 
 2. Create a virtual environment and activate it:
     ```sh
     python -m venv env
-    source env/bin/activate  # On Windows, use `env\Scripts\activate`
+    source env/bin/activate  # On Windows: env\Scripts\activate
     ```
 
-3. Install the required packages:
+3. Install dependencies:
     ```sh
     pip install -r requirements.txt
     ```
 
+4. Install the package in editable mode:
+    ```sh
+    pip install -e .
+    ```
+
 ## Usage
 
-Run the script with the following command:
+### Command-Line Interface
+Run the package using the CLI:
 
 ```sh
-python forex_events_scheduler.py
+forexfactory-scraper --currency USD --impact High --output-file usd_high_impact_events
 ```
 
-### Command-Line Options
-
+#### Command-Line Options
 | Option              | Description                                                                 |
 |---------------------|-----------------------------------------------------------------------------|
 | `--schedule`        | Schedule the script to run every hour.                                      |
@@ -58,62 +64,59 @@ python forex_events_scheduler.py
 | `--title`           | Filter events by title (case-insensitive).                                  |
 | `--impact`          | Filter events by impact (e.g., `High`, `Medium`, `Low`).                    |
 | `--save-format`     | Save format: `json` or `txt` (default: `json`).                             |
-| `--output-file`     | Base name for the output file (without extension, default: `filtered_events`). |
+| `--output-file`     | Base name for the output file (default: `filtered_events`).                 |
 | `--timezone`        | Convert event times to the specified timezone (e.g., `America/New_York`).   |
 | `--system-timezone` | Use the system's local timezone for event times.                            |
 | `--config`          | Path to a JSON config file to load options from.                            |
 
-### Examples
-
+#### Examples
 1. **Run Once with Default Settings**:
    ```sh
-   python forex_events_scheduler.py
+   forexfactory-scraper
    ```
-   Output files: `filtered_events.json` or `filtered_events.txt`.
+   Output: `filtered_events.json`
 
 2. **Filter by Currency and Save as TXT**:
    ```sh
-   python forex_events_scheduler.py --currency USD --save-format txt --output-file usd_events
+   forexfactory-scraper --currency USD --save-format txt --output-file usd_events
    ```
-   Output file: `usd_events.txt`.
+   Output: `usd_events.txt`
 
-3. **Schedule the Script to Run Every Hour**:
+3. **Schedule Hourly Runs**:
    ```sh
-   python forex_events_scheduler.py --schedule
-   ```
-
-4. **Custom File Name and Filters**:
-   ```sh
-   python forex_events_scheduler.py --currency USD --impact High --output-file high_impact_usd_events
-   ```
-   Output file: `high_impact_usd_events.json`.
-
-5. **Convert Event Times to a Specific Timezone**:
-   ```sh
-   python forex_events_scheduler.py --timezone America/New_York
+   forexfactory-scraper --schedule
    ```
 
-6. **Use System Timezone**:
+4. **Use Config File**:
    ```sh
-   python forex_events_scheduler.py --system-timezone
+   forexfactory-scraper --config config.json
    ```
 
-7. **Load Configuration from a JSON File**:
-   ```sh
-   python forex_events_scheduler.py --config config.json
-   ```
+### Programmatic Usage
+Use the package in your Python code:
+
+```python
+from forexfactory_scraper import fetch_and_parse_xml, save_events
+
+# Fetch and filter events
+events = fetch_and_parse_xml(
+    currency_filter="USD",
+    impact_filter="High",
+    user_timezone="Asia/Tehran"
+)
+
+# Save events
+save_events(events, "usd_high_impact_events", save_format="json")
+```
 
 ## Running as a Background Process
-
-To run the script as a background process, you can use `nohup` or a process manager like `systemd`:
+Use `nohup` or a process manager like `systemd`:
 
 ```sh
-nohup python forex_events_scheduler.py --schedule &
+nohup forexfactory-scraper --schedule &
 ```
 
 ## Output Files
-
-The script generates output files based on the provided options:
 - **JSON Format**:
   ```json
   [
@@ -121,7 +124,7 @@ The script generates output files based on the provided options:
           "title": "Nonfarm Payrolls",
           "currency": "USD",
           "date": "10-27-2023",
-          "time": "08:30am",
+          "time": "08:30",
           "impact": "High",
           "forecast": "200K",
           "previous": "187K",
@@ -136,7 +139,7 @@ The script generates output files based on the provided options:
   Title: Nonfarm Payrolls
   Currency: USD
   Date: 10-27-2023
-  Time: 08:30am
+  Time: 08:30
   Impact: High
   Forecast: 200K
   Previous: 187K
@@ -145,11 +148,20 @@ The script generates output files based on the provided options:
   ----------------------------------------
   ```
 
-## Configuration File Example
+## Configuration File
+Create a `config.json` file to store options:
 
-Change `config.json` file to store frequently used options:
-
+```json
+{
+    "schedule": false,
+    "currency": "USD",
+    "impact": "High",
+    "save_format": "json",
+    "output_file": "usd_high_impact_events",
+    "system_timezone": false,
+    "timezone": "Asia/Tehran"
+}
+```
 
 ## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for details.
