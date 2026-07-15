@@ -1,7 +1,6 @@
 import click
 import schedule as sched
 import time
-from typing import Optional
 from .fetcher import fetch_and_parse_xml
 from .writer import save_events
 from .time_utils import get_system_timezone
@@ -19,17 +18,16 @@ from .config import load_config
 @click.option("--config", type=click.Path(exists=True), default=None, help="Path to a JSON config file.")
 def main(
     schedule: bool,
-    currency: Optional[str],
-    title: Optional[str],
-    impact: Optional[str],
+    currency: str | None,
+    title: str | None,
+    impact: str | None,
     save_format: str,
     output_file: str,
-    timezone: Optional[str],
+    timezone: str | None,
     system_timezone: bool,
-    config: Optional[str]
+    config: str | None,
 ) -> None:
     """Fetch and parse Forex Factory events with optional filters."""
-    # Load config from JSON file if provided
     if config:
         config_data = load_config(config)
         if config_data:

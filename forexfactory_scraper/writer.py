@@ -1,7 +1,6 @@
 import json
-from typing import List, Dict
 
-def save_events(events: List[Dict], output_file: str, save_format: str = "json") -> None:
+def save_events(events: list[dict], output_file: str, save_format: str = "json") -> None:
     """Save events to a file in the specified format."""
     if save_format == "json":
         output_filename = f"{output_file}.json"

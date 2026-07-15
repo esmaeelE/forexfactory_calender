@@ -1,0 +1,36 @@
+[project]
+name = "forexfactory-scraper"
+version = "0.1.0"
+description = "A Python package to fetch and parse Forex Factory events with filtering and scheduling capabilities."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "Abolfazl Abbasi", email = "a.abbasi5775@gmail.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2.32.3",
+    "click>=8.0.0",
+    "schedule>=1.2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "mypy>=0.900",
+    "sphinx>=5.0",
+    "sphinx-rtd-theme>=1.0",
+    "sphinx-autodoc-typehints>=1.19",
+]
+
+[project.scripts]
+forexfactory-scraper = "forexfactory_scraper.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

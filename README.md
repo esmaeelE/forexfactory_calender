@@ -31,20 +31,9 @@ A Python package to fetch, filter, and save Forex events from [Forex Factory's](
     cd forexfactory-scraper
     ```
 
-2. Create a virtual environment and activate it:
+2. Install with UV:
     ```sh
-    python -m venv env
-    source env/bin/activate  # On Windows: env\Scripts\activate
-    ```
-
-3. Install dependencies:
-    ```sh
-    pip install -r requirements.txt
-    ```
-
-4. Install the package in editable mode:
-    ```sh
-    pip install -e .
+    uv sync
     ```
 
 ## Usage
