@@ -1,4 +1,5 @@
-__pycache__/
+ri__pycache__/
+output/
 *.py[cod]
 *.egg-info/
 dist/

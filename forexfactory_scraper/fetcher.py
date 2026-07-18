@@ -12,7 +12,7 @@ _PERSIAN_DAYS = {
     "Tuesday": "seshanbe",
     "Wednesday": "chaharshanbe",
     "Thursday": "panjshanbe",
-    "Friday": "jomeh",
+    "Friday": "jome",
 }
 
 def fetch_xml(timeout: int = 10) -> ET.Element | None:

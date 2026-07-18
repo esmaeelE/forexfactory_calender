@@ -11,7 +11,7 @@ from .config import load_config
 @click.option("--currency", type=str, help="Filter events by currency (e.g., USD, EUR).")
 @click.option("--title", type=str, help="Filter events by title (case-insensitive).")
 @click.option("--impact", type=str, help="Filter events by impact (e.g., High, Medium, Low).")
-@click.option("--save-format", type=click.Choice(["json", "txt"]), default="json", help="Save format: json or txt.")
+@click.option("--save-format", type=click.Choice(["json", "txt", "md"]), default="json", help="Save format: json, txt, or md.")
 @click.option("--output-file", type=str, default="filtered_events", help="Base name for the output file.")
 @click.option("--timezone", type=str, default=None, help="Convert event times to the specified timezone.")
 @click.option("--system-timezone", is_flag=True, help="Use the system's local timezone for event times.")
@@ -31,13 +31,20 @@ def main(
     if config:
         config_data = load_config(config)
         if config_data:
-            currency = config_data.get("currency", currency)
-            title = config_data.get("title", title)
-            impact = config_data.get("impact", impact)
-            save_format = config_data.get("save_format", save_format)
-            output_file = config_data.get("output_file", output_file)
-            timezone = config_data.get("timezone", timezone)
-            system_timezone = config_data.get("system_timezone", system_timezone)
+            if "currency" in config_data:
+                currency = config_data["currency"]
+            if "title" in config_data:
+                title = config_data["title"]
+            if "impact" in config_data:
+                impact = config_data["impact"]
+            if "save_format" in config_data:
+                save_format = config_data["save_format"]
+            if "output_file" in config_data:
+                output_file = config_data["output_file"]
+            if "timezone" in config_data:
+                timezone = config_data["timezone"]
+            if "system_timezone" in config_data:
+                system_timezone = config_data["system_timezone"]
             print(f"Loaded configuration from {config}")
 
     if system_timezone and not timezone:

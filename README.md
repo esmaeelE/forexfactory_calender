@@ -1,156 +1,162 @@
-# Forex Factory Scraper
+# Forexfactory Calendar
 
-![Python](https://img.shields.io/badge/Python-3.x-blue)
-![License](https://img.shields.io/badge/License-Apache%202.0-blue)
-
-A Python package to fetch, filter, and save Forex events from [Forex Factory's](https://www.forexfactory.com/) weekly calendar. The package supports filtering events by currency, title, and impact, and saves output in JSON or TXT format. It includes scheduling capabilities, timezone support, and trading session identification.
+A Python CLI tool and library to fetch, filter, and save **Forex Factory** economic calendar events in JSON, TXT, or Markdown format.
 
 ## Features
 
-- **Automated Fetching**: Fetches Forex events from Forex Factory's weekly calendar.
-- **Event Parsing**: Extracts details like title, currency, date, time, impact, forecast, previous value, and URL.
-- **Custom Filters**: Filter events by:
-  - **Currency** (e.g., USD, EUR)
-  - **Title** (case-insensitive search)
-  - **Impact** (e.g., High, Medium, Low)
-- **Output Formats**: Save events in:
-  - **JSON**: Structured and machine-readable.
-  - **TXT**: Human-readable, formatted text.
-- **Custom File Names**: Specify a custom base name for output files.
-- **Scheduling**: Run the script hourly using the `schedule` library.
-- **Timezone Support**: Convert event times to a specified or system timezone.
-- **Trading Sessions**: Identifies active sessions (e.g., London, New York) and "Golden Time" (London-NY overlap).
-- **Configuration File**: Load options from a JSON config file for automation.
+- Fetches live events from the Forex Factory XML feed
+- Filters by **currency**, **impact**, and **title**
+- Outputs to **JSON**, **TXT**, or **Markdown** (with color-coded impact sections)
+- Converts event times to any IANA timezone or the system's local timezone
+- Detects active **trading sessions** (London, New York, Tokyo, Sydney, Golden Time)
+- Includes English day names and romanized Persian day names
+- Optional **hourly scheduling** mode
+- JSON config file support
+- 47 unit tests
 
 ## Installation
 
-### From Source
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/abbasi0abolfazl/forexfactory-scraper.git
-    cd forexfactory-scraper
-    ```
+```bash
+# Using uv (recommended)
+uv sync
 
-2. Install with UV:
-    ```sh
-    uv sync
-    ```
-
-## Usage
-
-### Command-Line Interface
-Run the package using the CLI:
-
-```sh
-forexfactory-scraper --currency USD --impact High --output-file usd_high_impact_events
+# Or with pip
+pip install -e .
 ```
 
-#### Command-Line Options
-| Option              | Description                                                                 |
-|---------------------|-----------------------------------------------------------------------------|
-| `--schedule`        | Schedule the script to run every hour.                                      |
-| `--currency`        | Filter events by currency (e.g., `USD`, `EUR`).                             |
-| `--title`           | Filter events by title (case-insensitive).                                  |
-| `--impact`          | Filter events by impact (e.g., `High`, `Medium`, `Low`).                    |
-| `--save-format`     | Save format: `json` or `txt` (default: `json`).                             |
-| `--output-file`     | Base name for the output file (default: `filtered_events`).                 |
-| `--timezone`        | Convert event times to the specified timezone (e.g., `America/New_York`).   |
-| `--system-timezone` | Use the system's local timezone for event times.                            |
-| `--config`          | Path to a JSON config file to load options from.                            |
+## Quick Start
 
-#### Examples
-1. **Run Once with Default Settings**:
-   ```sh
-   forexfactory-scraper
-   ```
-   Output: `filtered_events.json`
+```bash
+# Run with default config (USD High Impact, Asia/Tehran)
+forexfactory-scraper
 
-2. **Filter by Currency and Save as TXT**:
-   ```sh
-   forexfactory-scraper --currency USD --save-format txt --output-file usd_events
-   ```
-   Output: `usd_events.txt`
+# Filter USD High Impact events, save as Markdown
+forexfactory-scraper --currency USD --impact High --save-format md
 
-3. **Schedule Hourly Runs**:
-   ```sh
-   forexfactory-scraper --schedule
-   ```
+# Use a config file
+forexfactory-scraper --config config.json
 
-4. **Use Config File**:
-   ```sh
-   forexfactory-scraper --config config.json
-   ```
-
-### Programmatic Usage
-Use the package in your Python code:
-
-```python
-from forexfactory_scraper import fetch_and_parse_xml, save_events
-
-# Fetch and filter events
-events = fetch_and_parse_xml(
-    currency_filter="USD",
-    impact_filter="High",
-    user_timezone="Asia/Tehran"
-)
-
-# Save events
-save_events(events, "usd_high_impact_events", save_format="json")
+# Auto-detect system timezone
+forexfactory-scraper --system-timezone
 ```
 
-## Running as a Background Process
-Use `nohup` or a process manager like `systemd`:
+## CLI Options
 
-```sh
-nohup forexfactory-scraper --schedule &
-```
+| Option | Description |
+|--------|-------------|
+| `--currency` | Filter by currency code (e.g., USD, EUR) |
+| `--impact` | Filter by impact level (High, Medium, Low) |
+| `--title` | Filter by event title (case-insensitive substring) |
+| `--save-format` | Output format: `json`, `txt`, or `md` (default: json) |
+| `--output-file` | Base filename for output (default: filtered_events) |
+| `--timezone` | Convert times to IANA timezone (e.g., Asia/Tehran) |
+| `--system-timezone` | Use system's local timezone for event times |
+| `--config` | Path to a JSON config file |
+| `--schedule` | Run every hour |
 
-## Output Files
-- **JSON Format**:
-  ```json
-  [
-      {
-          "title": "Nonfarm Payrolls",
-          "currency": "USD",
-          "date": "10-27-2023",
-          "time": "08:30",
-          "impact": "High",
-          "forecast": "200K",
-          "previous": "187K",
-          "url": "https://www.forexfactory.com/event/12345",
-          "sessions": ["New York", "London", "Golden Time"]
-      }
-  ]
-  ```
+## Config File
 
-- **TXT Format**:
-  ```
-  Title: Nonfarm Payrolls
-  Currency: USD
-  Date: 10-27-2023
-  Time: 08:30
-  Impact: High
-  Forecast: 200K
-  Previous: 187K
-  URL: https://www.forexfactory.com/event/12345
-  Sessions: New York, London, Golden Time
-  ----------------------------------------
-  ```
-
-## Configuration File
-Create a `config.json` file to store options:
+Create a `config.json`:
 
 ```json
 {
-    "schedule": false,
     "currency": "USD",
     "impact": "High",
-    "save_format": "json",
+    "save_format": "md",
     "output_file": "usd_high_impact_events",
+    "timezone": "Asia/Tehran",
     "system_timezone": false,
-    "timezone": "Asia/Tehran"
+    "schedule": false
 }
 ```
 
+Any CLI option can be set via config. CLI flags always take precedence.
+
+## Output Formats
+
+### Markdown (`--save-format md`)
+
+Produces a structured document with:
+- Event count summary by impact level
+- Separate tables per impact category (🔴 High, 🟡 Medium, 🟢 Low)
+- Bold formatting for high-impact events
+- English + romanized Persian day names
+- Active trading sessions per event
+
+### JSON (`--save-format json`)
+
+```json
+[
+    {
+        "title": "Non-Farm Employment Change",
+        "currency": "USD",
+        "date": "07-18-2025",
+        "day_of_week": "Friday",
+        "day_of_week_persian": "jome",
+        "time": "08:30",
+        "impact": "High",
+        "forecast": "180K",
+        "previous": "272K",
+        "url": "...",
+        "sessions": ["New York", "London", "Golden Time"]
+    }
+]
+```
+
+### TXT (`--save-format txt`)
+
+Plain text with labeled fields separated by dashes.
+
+## Output Directory
+
+All output files are saved to the `output/` directory by default.
+
+## Trading Sessions
+
+Times are evaluated against these session windows (FOREX_FACTORY_TZ = America/New_York):
+
+| Session | Start | End |
+|---------|-------|-----|
+| Sydney | 5:00 PM | 2:00 AM |
+| Tokyo | 7:00 PM | 4:00 AM |
+| London | 3:00 AM | 12:00 PM |
+| New York | 8:00 AM | 5:00 PM |
+| Golden Time | 8:00 AM | 12:00 PM (London+NY overlap) |
+
+## Development
+
+```bash
+# Run tests
+python -m pytest tests/ -v
+
+# Run with default config
+forexfactory-scraper
+```
+
+## Project Structure
+
+```
+forexfactory_calender/
+├── forexfactory_scraper/
+│   ├── __init__.py        # Package version
+│   ├── cli.py             # Click CLI interface
+│   ├── config.py          # JSON config loader
+│   ├── constants.py       # URLs, session definitions, timezone
+│   ├── fetcher.py         # XML fetch + event parsing/filtering
+│   ├── sessions.py        # Trading session detection
+│   ├── time_utils.py      # Timezone conversion utilities
+│   └── writer.py          # Output writers (JSON, TXT, Markdown)
+├── tests/
+│   ├── test_config.py
+│   ├── test_fetcher.py
+│   ├── test_sessions.py
+│   ├── test_time_utils.py
+│   └── test_writer.py
+├── config.json
+├── pyproject.toml
+└── README.md
+```
+
 ## License
-This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for details.
+
+MIT
